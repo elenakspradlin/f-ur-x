@@ -1,0 +1,92 @@
+import React, { useRef } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { registerUser } from "../../managers/AuthManager"
+import "./Auth.css"
+
+export const Register = () => {
+    const firstName = useRef()
+    const lastName = useRef()
+    const username = useRef()
+    const password = useRef()
+    const bio = useRef()
+    const day_of_breakup = useRef()
+    const verifyPassword = useRef()
+    const passwordDialog = useRef()
+    const navigate = useNavigate()
+
+    const handleRegister = (e) => {
+        e.preventDefault()
+
+        if (password.current.value === verifyPassword.current.value) {
+            const newUser = {
+                "username": username.current.value,
+                "first_name": firstName.current.value,
+                "last_name": lastName.current.value,
+                "password": password.current.value,
+                "bio": bio.current.value,
+                "day_of_breakup": day_of_breakup.current.value
+            }
+
+            registerUser(newUser)
+                .then(res => {
+                    if ("token" in res) {
+                        localStorage.setItem("furx_token", res.token)
+                        navigate("/")
+                    }
+                })
+        } else {
+            passwordDialog.current.showModal()
+        }
+    }
+
+    return (
+        <main style={{ textAlign: "center" }}>
+
+            <dialog className="dialog dialog--password" ref={passwordDialog}>
+                <div>Passwords do not match</div>
+                <button className="button--close" onClick={e => passwordDialog.current.close()}>Close</button>
+            </dialog>
+
+            <form className="form--login" onSubmit={handleRegister}>
+                <h1 className="h3 mb-3 font-weight-normal">Register an account</h1>
+                <fieldset>
+                    <label htmlFor="firstName"> <h3>First Name</h3> </label>
+                    <input ref={firstName} type="text" name="firstName" className="form-control" placeholder="First name" required autoFocus />
+                </fieldset>
+                <fieldset>
+                    <label htmlFor="lastName"> <h3>Last Name</h3> </label>
+                    <input ref={lastName} type="text" name="lastName" className="form-control" placeholder="Last name" required />
+                </fieldset>
+                <fieldset>
+                    <label htmlFor="inputUsername"><h3>Username</h3></label>
+                    <input ref={username} type="text" name="username" className="form-control" placeholder="Username" required />
+                </fieldset>
+                <fieldset>
+                    <label htmlFor="inputPassword"><h3>Password </h3> </label>
+                    <input ref={password} type="password" name="password" className="form-control" placeholder="Password" required />
+                </fieldset>
+                <fieldset>
+                    <label htmlFor="verifyPassword"> <h3>Verify Password </h3></label>
+                    <input ref={verifyPassword} type="password" name="verifyPassword" className="form-control" placeholder="Verify password" required />
+                </fieldset>
+                <fieldset>
+                    <label htmlFor="bio"><h3>Bio</h3></label>
+                    <input ref={bio} type="text" name="bio" className="form-control" placeholder="bio" required />
+
+                </fieldset>
+                <fieldset>
+                    <label htmlFor="dateOfBreakup"><h3>Date of Breakup</h3></label>
+                    <input ref={day_of_breakup} type="date" name="dateOfBreakup" className="form-control" required />
+                </fieldset>
+                <fieldset style={{
+                    textAlign: "center"
+                }}>
+                    <button className="btn" type="submit"><Link to="/about">Register</Link></button>
+                </fieldset>
+            </form>
+            <section className="link--register">
+                Already registered? <Link to="/login">Login</Link>
+            </section>
+        </main >
+    )
+}
